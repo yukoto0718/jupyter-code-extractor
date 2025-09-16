@@ -1,20 +1,15 @@
 name: Deploy to GitHub Pages
 
 on:
-  # 当推送到 main 分支时触发
   push:
     branches: [main]
-
-  # 也可以手动触发
   workflow_dispatch:
 
-# 设置权限
 permissions:
   contents: read
   pages: write
   id-token: write
 
-# 确保同时只有一个部署在运行
 concurrency:
   group: 'pages'
   cancel-in-progress: false
