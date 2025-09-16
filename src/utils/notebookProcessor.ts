@@ -4,11 +4,11 @@ import { removeComments } from './commentRemover'
 export class NotebookProcessor {
   static process(notebook: JupyterNotebook, options: ProcessOptions): ProcessResult {
     const codeCells = notebook.cells.filter(
-      (cell) => cell.cell_type === 'code' && this.getCellSource(cell).trim(),
+      (cell) => cell.cell_type === 'code' && this.getCellSource(cell).trim()
     )
 
     if (codeCells.length === 0) {
-      throw new Error('没有找到包含代码的单元格')
+      throw new Error('The cell containing the code was not found')
     }
 
     let content: string

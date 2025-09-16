@@ -6,17 +6,17 @@
           <el-icon><Document /></el-icon>
           Jupyter Code Extractor
         </h1>
-        <p>提取Jupyter Notebook中的纯代码，支持去除注释和文本单元格</p>
+        <p>Extract pure code from Jupyter Notebook, support removing comments and text cells</p>
       </el-header>
 
       <el-main>
         <div class="main-content">
-          <!-- 文件上传区域 -->
+          <!-- File Upload Area -->
           <el-card class="upload-card" shadow="hover">
             <template #header>
               <div class="card-header">
                 <el-icon><Upload /></el-icon>
-                <span>上传Notebook文件</span>
+                <span>Upload Notebook File</span>
               </div>
             </template>
 
@@ -30,9 +30,9 @@
               accept=".ipynb"
             >
               <el-icon class="el-icon--upload"><upload-filled /></el-icon>
-              <div class="el-upload__text">将 .ipynb 文件拖拽到此处，或<em>点击上传</em></div>
+              <div class="el-upload__text">Drag .ipynb files here or <em>click to upload</em></div>
               <template #tip>
-                <div class="el-upload__tip">支持 .ipynb 格式的Jupyter Notebook文件</div>
+                <div class="el-upload__tip">Supports .ipynb format Jupyter Notebook files</div>
               </template>
             </el-upload>
 
@@ -47,24 +47,24 @@
             </div>
           </el-card>
 
-          <!-- 处理选项 -->
+          <!-- Processing Options -->
           <el-card v-if="selectedFile" class="options-card" shadow="hover">
             <template #header>
               <div class="card-header">
                 <el-icon><Setting /></el-icon>
-                <span>处理选项</span>
+                <span>Processing Options</span>
               </div>
             </template>
 
             <el-row :gutter="20">
               <el-col :span="12">
                 <el-checkbox v-model="options.removeMarkdown" size="large">
-                  去除Markdown文本单元格
+                  Remove Markdown text cells
                 </el-checkbox>
               </el-col>
               <el-col :span="12">
                 <el-checkbox v-model="options.removeComments" size="large">
-                  去除代码注释
+                  Remove code comments
                 </el-checkbox>
               </el-col>
             </el-row>
@@ -72,21 +72,21 @@
             <el-divider />
 
             <div class="output-format">
-              <label class="format-label">输出格式：</label>
+              <label class="format-label">Output Format:</label>
               <el-radio-group v-model="options.outputFormat" size="large">
                 <el-radio label="python">
                   <el-icon><Document /></el-icon>
-                  Python文件 (.py)
+                  Python File (.py)
                 </el-radio>
                 <el-radio label="markdown">
                   <el-icon><Edit /></el-icon>
-                  Markdown文件 (.md)
+                  Markdown File (.md)
                 </el-radio>
               </el-radio-group>
             </div>
           </el-card>
 
-          <!-- 处理按钮 -->
+          <!-- Process Button -->
           <div v-if="selectedFile" class="action-section">
             <el-button
               type="primary"
@@ -96,39 +96,41 @@
               :disabled="!selectedFile"
             >
               <el-icon><CircleCheck /></el-icon>
-              <!-- 原来是 Magic -->
-              {{ processing ? '处理中...' : '提取代码' }}
+              {{ processing ? 'Processing...' : 'Extract Code' }}
             </el-button>
           </div>
 
-          <!-- 结果显示 -->
+          <!-- Results Display -->
           <el-card v-if="result" class="result-card" shadow="hover">
             <template #header>
               <div class="card-header">
                 <el-icon><Check /></el-icon>
-                <span>处理完成</span>
+                <span>Processing Complete</span>
               </div>
             </template>
 
-            <el-result icon="success" :title="`成功提取 ${result.cellCount} 个代码单元格`">
+            <el-result
+              icon="success"
+              :title="`Successfully extracted ${result.cellCount} code cells`"
+            >
               <template #extra>
                 <el-button type="primary" @click="downloadResult">
                   <el-icon><Download /></el-icon>
-                  下载 {{ result.filename }}
+                  Download {{ result.filename }}
                 </el-button>
                 <el-button @click="reset">
                   <el-icon><Refresh /></el-icon>
-                  重新处理
+                  Process Again
                 </el-button>
               </template>
             </el-result>
 
-            <!-- 预览 -->
+            <!-- Preview -->
             <el-collapse v-model="activeCollapse">
               <el-collapse-item name="preview">
                 <template #title>
                   <el-icon><View /></el-icon>
-                  预览内容
+                  Preview Content
                 </template>
                 <el-input
                   v-model="result.content"
@@ -168,7 +170,7 @@ import {
   Close,
   Setting,
   Edit,
-  CircleCheck, // 替换 Magic
+  CircleCheck,
   Check,
   Download,
   Refresh,
@@ -179,7 +181,7 @@ import {
 import type { ProcessOptions, ProcessResult, JupyterNotebook } from './types/notebook'
 import { NotebookProcessor } from './utils/notebookProcessor'
 
-// 响应式数据
+// Reactive data
 const selectedFile = ref<File | null>(null)
 const processing = ref(false)
 const result = ref<ProcessResult | null>(null)
@@ -191,19 +193,19 @@ const options = reactive<ProcessOptions>({
   outputFormat: 'python',
 })
 
-// 文件处理
+// File handling
 const handleFileChange = (file: any) => {
   const rawFile = file.raw
 
   if (!rawFile.name.endsWith('.ipynb')) {
-    ElMessage.error('请上传 .ipynb 格式的文件')
+    ElMessage.error('Please upload .ipynb format files')
     return
   }
 
   selectedFile.value = rawFile
   result.value = null
 
-  ElMessage.success(`文件 ${rawFile.name} 上传成功`)
+  ElMessage.success(`File ${rawFile.name} uploaded successfully`)
 }
 
 const clearFile = () => {
@@ -211,10 +213,10 @@ const clearFile = () => {
   result.value = null
 }
 
-// 处理文件
+// Process file
 const processFile = async () => {
   if (!selectedFile.value) {
-    ElMessage.error('请先选择文件')
+    ElMessage.error('Please select a file first')
     return
   }
 
@@ -224,36 +226,38 @@ const processFile = async () => {
     const fileContent = await readFileAsText(selectedFile.value)
     const notebook: JupyterNotebook = JSON.parse(fileContent)
 
-    // 验证文件格式
+    // Validate file format
     if (!notebook.cells || !Array.isArray(notebook.cells)) {
-      throw new Error('无效的 Jupyter Notebook 格式')
+      throw new Error('Invalid Jupyter Notebook format')
     }
 
     result.value = NotebookProcessor.process(notebook, options)
 
     ElNotification({
-      title: '处理完成',
-      message: `成功提取 ${result.value.cellCount} 个代码单元格`,
+      title: 'Processing Complete',
+      message: `Successfully extracted ${result.value.cellCount} code cells`,
       type: 'success',
     })
   } catch (error) {
-    ElMessage.error(`处理失败: ${error instanceof Error ? error.message : '未知错误'}`)
+    ElMessage.error(
+      `Processing failed: ${error instanceof Error ? error.message : 'Unknown error'}`
+    )
   } finally {
     processing.value = false
   }
 }
 
-// 读取文件内容
+// Read file content
 const readFileAsText = (file: File): Promise<string> => {
   return new Promise((resolve, reject) => {
     const reader = new FileReader()
     reader.onload = (e) => resolve(e.target?.result as string)
-    reader.onerror = () => reject(new Error('文件读取失败'))
+    reader.onerror = () => reject(new Error('File reading failed'))
     reader.readAsText(file, 'utf-8')
   })
 }
 
-// 下载结果
+// Download result
 const downloadResult = () => {
   if (!result.value) return
 
@@ -268,10 +272,10 @@ const downloadResult = () => {
   document.body.removeChild(link)
   URL.revokeObjectURL(url)
 
-  ElMessage.success('文件下载开始')
+  ElMessage.success('File download started')
 }
 
-// 重置
+// Reset
 const reset = () => {
   selectedFile.value = null
   result.value = null
@@ -375,7 +379,7 @@ const reset = () => {
   text-decoration: underline;
 }
 
-/* 响应式设计 */
+/* Responsive design */
 @media (max-width: 768px) {
   .main-content {
     padding: 10px;

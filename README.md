@@ -1,95 +1,88 @@
 # Jupyter Code Extractor
 
-一个简洁、易用的 Jupyter Notebook 代码提取工具，帮你快速提取纯代码并去除注释。
+**English Version** | [中文版](./README_CN.md)
 
-## ✨ 功能特点
+A clean and user-friendly Jupyter Notebook code extraction tool that helps you quickly extract pure code and remove comments.
 
-- 📁 **拖拽上传** - 支持拖拽或点击上传 .ipynb 文件
-- 💬 **注释删除** - 智能删除 Python 代码注释，不误删字符串中的 # 符号
-- 📝 **双输出格式** - 支持导出为 .py 或 .md 格式
-- 👀 **实时预览** - 处理前可预览结果内容
-- 🔒 **隐私安全** - 所有处理在浏览器本地完成，文件不上传到服务器
+### ✨ Features
 
-## 🎯 使用场景
+📁 Drag & Drop Upload - Support drag and drop or click to upload .ipynb files
+🧹 Smart Filtering - Optional removal of Markdown text cells
+💬 Comment Removal - Intelligently remove Python code comments without affecting # symbols in strings
+📝 Dual Output Formats - Export as .py or .md formats
+👀 Real-time Preview - Preview results before processing
+🔒 Privacy Secure - All processing done locally in browser, no files uploaded to servers
 
-- 向 AI 助手提问时需要纯代码，避免大量输出干扰
-- 将 Jupyter 实验代码整理成可执行的 Python 脚本
-- 快速提取代码片段用于文档或分享
-- 批量处理 notebook 文件获取核心代码逻辑
+### 🎯 Use Cases
 
-## 🚀 在线使用
+Get clean code when asking AI assistants, avoiding large output interference
+Convert Jupyter experimental code into executable Python scripts
+Quickly extract code snippets for documentation or sharing
+Batch process notebook files to get core code logic
 
-访问：[https://yourusername.github.io/jupyter-code-extractor/](https://yourusername.github.io/jupyter-code-extractor/)
+### 🚀 Online Usage
 
-## 🛠️ 本地开发
+Visit: https://yukoto0718.github.io/jupyter-code-extractor/
 
-### 环境要求
+### 🛠️ Local Development
 
-- Node.js 16.0 或更高版本
-- npm 或 yarn 包管理器
+> Requirements
+> Node.js 16.0 or higher
+> npm or yarn package manager
 
-### 安装和运行
+### Install dependencies
 
-```bash
-# 克隆项目
-git clone https://github.com/yourusername/jupyter-code-extractor.git
-cd jupyter-code-extractor
-
-# 安装依赖
 npm install
 
-# 启动开发服务器
+### Start development server
+
 npm run dev
 
-# 构建生产版本
+### Build for production
+
 npm run build
 
-# 预览生产版本
-npm run preview
-```
+# Preview production build
 
-项目结构
+Project Structure
 
 ```
 jupyter-code-extractor/
 ├── src/
-│   ├── types/           # TypeScript类型定义
-│   │   └── notebook.ts
-│   ├── utils/           # 工具函数
-│   │   ├── commentRemover.ts      # 智能注释删除
-│   │   └── notebookProcessor.ts   # 主要处理逻辑
-│   ├── App.vue          # 主组件
-│   ├── main.ts          # 入口文件
-│   └── vite-env.d.ts    # Vite类型声明
-├── public/              # 静态资源
+│ ├── types/ # TypeScript type definitions
+│ │ └── notebook.ts
+│ ├── utils/ # Utility functions
+│ │ ├── commentRemover.ts # Smart comment removal
+│ │ └── notebookProcessor.ts # Main processing logic
+│ ├── App.vue # Main component
+│ ├── main.ts # Entry file
+│ └── vite-env.d.ts # Vite type declarations
+├── public/ # Static assets
 ├── .github/
-│   └── workflows/
-│       └── deploy.yml   # GitHub Actions自动部署
-├── vite.config.ts       # Vite配置
-├── tsconfig.json        # TypeScript配置
-└── package.json         # 项目配置
+│ └── workflows/
+│ └── deploy.yml # GitHub Actions auto deployment
+├── vite.config.ts # Vite configuration
+├── tsconfig.json # TypeScript configuration
+└── package.json # Project configuration
 ```
 
-📖 使用说明
-基本操作
+### 📖 Usage Guide
 
-上传文件：拖拽或点击上传你的 .ipynb 文件
-选择选项：
+#### Basic Operations
 
-✅ 去除 Markdown 文本单元格：只保留代码单元格
-✅ 去除代码注释：智能删除 # 注释（可选）
+Upload File: Drag and drop or click to upload your .ipynb file
+Select Options:
+✅ Remove Markdown text cells: Keep only code cells
+✅ Remove code comments: Intelligently delete # comments (optional)
 
-选择格式：
+Choose Format:
+🐍 Python file (.py): Directly executable Python code
+📝 Markdown file (.md): Document with code block formatting
 
-🐍 Python 文件 (.py)：直接可执行的 Python 代码
-📝 Markdown 文件 (.md)：带代码块格式的文档
+## 🔧 Tech Stack
 
-处理下载：点击"提取代码"按钮，完成后下载结果
-
-## 🔧 技术栈
-
-- **前端框架**：Vue 3 + TypeScript
-- **UI 组件库**：Element Plus
-- **构建工具**：Vite
-- **部署平台**：GitHub Pages
-- **CI/CD**：GitHub Actions
+- **Frontend Framework**: Vue 3 + TypeScript
+- **UI Component Library**: Element Plus
+- **Build Tool**: Vite
+- **Deployment Platform**: GitHub Pages
+- **CI/CD**: GitHub Actions
