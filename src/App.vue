@@ -149,7 +149,7 @@
         <div class="footer-content">
           <p>
             Made with ❤️ for Jupyter users |
-            <a href="https://github.com/yourusername/jupyter-code-extractor" target="_blank">
+            <a href="https://github.com/yukoto0718/jupyter-code-extractor" target="_blank">
               <el-icon><Link /></el-icon>
               GitHub
             </a>
