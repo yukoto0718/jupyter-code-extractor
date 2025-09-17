@@ -6,7 +6,7 @@
           <el-icon><Document /></el-icon>
           Jupyter Code Extractor
         </h1>
-        <p>Extract pure code from Jupyter Notebook, support removing comments and text cells</p>
+        <p>Extract pure code from Jupyter Notebooks, remove comments and text cells</p>
       </el-header>
 
       <el-main>
@@ -30,9 +30,13 @@
               accept=".ipynb"
             >
               <el-icon class="el-icon--upload"><upload-filled /></el-icon>
-              <div class="el-upload__text">Drag .ipynb files here or <em>click to upload</em></div>
+              <div class="el-upload__text">
+                Drop your .ipynb file here, or <em>click to upload</em>
+              </div>
               <template #tip>
-                <div class="el-upload__tip">Supports .ipynb format Jupyter Notebook files</div>
+                <div class="el-upload__tip">
+                  Only .ipynb format Jupyter Notebook files are supported
+                </div>
               </template>
             </el-upload>
 
@@ -76,11 +80,11 @@
               <el-radio-group v-model="options.outputFormat" size="large">
                 <el-radio label="python">
                   <el-icon><Document /></el-icon>
-                  Python File (.py)
+                  Python file (.py)
                 </el-radio>
                 <el-radio label="markdown">
                   <el-icon><Edit /></el-icon>
-                  Markdown File (.md)
+                  Markdown file (.md)
                 </el-radio>
               </el-radio-group>
             </div>
@@ -120,7 +124,7 @@
                 </el-button>
                 <el-button @click="reset">
                   <el-icon><Refresh /></el-icon>
-                  Process Again
+                  Process Another
                 </el-button>
               </template>
             </el-result>
@@ -198,7 +202,7 @@ const handleFileChange = (file: any) => {
   const rawFile = file.raw
 
   if (!rawFile.name.endsWith('.ipynb')) {
-    ElMessage.error('Please upload .ipynb format files')
+    ElMessage.error('Please upload a .ipynb format file')
     return
   }
 
@@ -231,7 +235,7 @@ const processFile = async () => {
       throw new Error('Invalid Jupyter Notebook format')
     }
 
-    result.value = NotebookProcessor.process(notebook, options)
+    result.value = NotebookProcessor.process(notebook, options, selectedFile.value.name)
 
     ElNotification({
       title: 'Processing Complete',
@@ -252,7 +256,7 @@ const readFileAsText = (file: File): Promise<string> => {
   return new Promise((resolve, reject) => {
     const reader = new FileReader()
     reader.onload = (e) => resolve(e.target?.result as string)
-    reader.onerror = () => reject(new Error('File reading failed'))
+    reader.onerror = () => reject(new Error('Failed to read file'))
     reader.readAsText(file, 'utf-8')
   })
 }

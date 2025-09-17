@@ -2,24 +2,31 @@ import type { JupyterNotebook, ProcessOptions, ProcessResult } from '@/types/not
 import { removeComments } from './commentRemover'
 
 export class NotebookProcessor {
-  static process(notebook: JupyterNotebook, options: ProcessOptions): ProcessResult {
+  static process(
+    notebook: JupyterNotebook,
+    options: ProcessOptions,
+    originalFileName?: string
+  ): ProcessResult {
     const codeCells = notebook.cells.filter(
       (cell) => cell.cell_type === 'code' && this.getCellSource(cell).trim()
     )
 
     if (codeCells.length === 0) {
-      throw new Error('The cell containing the code was not found')
+      throw new Error('No code cells found in the notebook')
     }
+
+    // Generate filename based on original file name
+    const baseFileName = this.extractBaseFileName(originalFileName)
 
     let content: string
     let filename: string
 
     if (options.outputFormat === 'python') {
       content = this.generatePythonFile(codeCells, options)
-      filename = 'extracted_code.py'
+      filename = `${baseFileName}_extracted.py`
     } else {
       content = this.generateMarkdownFile(codeCells, options)
-      filename = 'extracted_code.md'
+      filename = `${baseFileName}_extracted.md`
     }
 
     return {
@@ -27,6 +34,30 @@ export class NotebookProcessor {
       filename,
       cellCount: codeCells.length,
     }
+  }
+
+  private static extractBaseFileName(originalFileName?: string): string {
+    if (!originalFileName) {
+      return 'notebook'
+    }
+
+    // Remove .ipynb extension and any path
+    const baseName =
+      originalFileName
+        .split('/')
+        .pop() // Remove path
+        ?.split('\\')
+        .pop() // Remove Windows path
+        ?.replace(/\.ipynb$/i, '') || // Remove .ipynb extension
+      'notebook'
+
+    // Clean filename: remove special characters, keep only alphanumeric, hyphens, underscores
+    return (
+      baseName
+        .replace(/[^a-zA-Z0-9\-_]/g, '_')
+        .replace(/_{2,}/g, '_')
+        .replace(/^_|_$/g, '') || 'notebook'
+    )
   }
 
   private static getCellSource(cell: any): string {
