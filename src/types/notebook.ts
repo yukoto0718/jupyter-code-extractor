@@ -27,7 +27,8 @@ export interface JupyterNotebook {
 
 export interface ProcessOptions {
   removeMarkdown: boolean
-  removeComments: boolean
+  removeSingleLineComments: boolean // 新增：去除单行注释 (#)
+  removeMultiLineComments: boolean // 新增：去除多行注释 (""")
   outputFormat: 'python' | 'markdown'
 }
 

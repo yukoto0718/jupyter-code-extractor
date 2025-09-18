@@ -1,11 +1,17 @@
 /**
  * 智能删除Python代码中的注释
- * 支持：
- * 1. 单行 # 注释
- * 2. 多行 """ 或 ''' 注释块
- * 3. 函数/类的 docstring
+ * 支持分别控制单行注释和多行注释的删除
  */
-export function removeComments(code: string): string {
+export function removeComments(
+  code: string,
+  removeSingleLine: boolean = true,
+  removeMultiLine: boolean = true
+): string {
+  // 如果两种注释都不删除，直接返回原代码
+  if (!removeSingleLine && !removeMultiLine) {
+    return code
+  }
+
   const lines = code.split('\n')
   const processedLines: string[] = []
   let inMultilineComment = false
@@ -20,14 +26,14 @@ export function removeComments(code: string): string {
       if (line.includes(multilineQuote)) {
         inMultilineComment = false
         multilineQuote = ''
-        continue
+        continue // 跳过结束行
       } else {
-        continue
+        continue // 跳过注释内容行
       }
     }
 
-    // 检查是否是多行注释开始
-    if (trimmed.startsWith('"""') || trimmed.startsWith("'''")) {
+    // 检查是否是多行注释开始 (只在启用多行注释删除时处理)
+    if (removeMultiLine && (trimmed.startsWith('"""') || trimmed.startsWith("'''"))) {
       const quote = trimmed.substring(0, 3)
 
       // 简单判断：如果行只包含引号和文本，很可能是注释
@@ -41,7 +47,7 @@ export function removeComments(code: string): string {
         // 检查是否在同一行结束
         const restOfLine = line.substring(line.indexOf(quote) + 3)
         if (restOfLine.includes(quote)) {
-          // 单行注释块，直接跳过
+          // 单行多行注释块，直接跳过
           continue
         } else {
           // 多行注释块开始
@@ -52,8 +58,11 @@ export function removeComments(code: string): string {
       }
     }
 
-    // 处理单行注释
-    const processedLine = removeSingleLineComments(line)
+    // 处理单行注释 (只在启用单行注释删除时处理)
+    let processedLine = line
+    if (removeSingleLine) {
+      processedLine = removeSingleLineComments(line)
+    }
 
     // 只保留非空行
     if (processedLine.trim()) {

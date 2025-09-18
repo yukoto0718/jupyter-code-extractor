@@ -84,8 +84,12 @@ export class NotebookProcessor {
 
       if (cell.cell_type === 'code') {
         // 处理代码单元格
-        if (options.removeComments) {
-          cellContent = removeComments(cellContent)
+        if (options.removeSingleLineComments || options.removeMultiLineComments) {
+          cellContent = removeComments(
+            cellContent,
+            options.removeSingleLineComments,
+            options.removeMultiLineComments
+          )
         }
 
         if (cellContent.trim()) {
@@ -115,8 +119,12 @@ export class NotebookProcessor {
 
       if (cell.cell_type === 'code') {
         // 处理代码单元格
-        if (options.removeComments) {
-          cellContent = removeComments(cellContent)
+        if (options.removeSingleLineComments || options.removeMultiLineComments) {
+          cellContent = removeComments(
+            cellContent,
+            options.removeSingleLineComments,
+            options.removeMultiLineComments
+          )
         }
 
         if (cellContent.trim()) {

@@ -61,14 +61,24 @@
             </template>
 
             <el-row :gutter="20">
-              <el-col :span="12">
+              <el-col :span="24">
                 <el-checkbox v-model="options.removeMarkdown" size="large">
                   Remove Markdown text cells
                 </el-checkbox>
               </el-col>
+            </el-row>
+
+            <el-divider>Comment Removal Options</el-divider>
+
+            <el-row :gutter="20">
               <el-col :span="12">
-                <el-checkbox v-model="options.removeComments" size="large">
-                  Remove all comments (# and """)
+                <el-checkbox v-model="options.removeSingleLineComments" size="large">
+                  Remove single-line comments (#)
+                </el-checkbox>
+              </el-col>
+              <el-col :span="12">
+                <el-checkbox v-model="options.removeMultiLineComments" size="large">
+                  Remove multi-line comments (""")
                 </el-checkbox>
               </el-col>
             </el-row>
@@ -193,7 +203,8 @@ const activeCollapse = ref<string[]>([])
 
 const options = reactive<ProcessOptions>({
   removeMarkdown: true,
-  removeComments: false,
+  removeSingleLineComments: false, // 默认不删除单行注释
+  removeMultiLineComments: false, // 默认不删除多行注释
   outputFormat: 'python',
 })
 
