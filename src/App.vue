@@ -68,7 +68,7 @@
               </el-col>
               <el-col :span="12">
                 <el-checkbox v-model="options.removeComments" size="large">
-                  Remove code comments
+                  Remove all comments (# and """)
                 </el-checkbox>
               </el-col>
             </el-row>

@@ -1,14 +1,61 @@
 /**
  * 智能删除Python代码中的注释
- * 避免删除字符串中的 # 符号
+ * 支持：
+ * 1. 单行 # 注释
+ * 2. 多行 """ 或 ''' 注释块
+ * 3. 函数/类的 docstring
  */
 export function removeComments(code: string): string {
   const lines = code.split('\n')
   const processedLines: string[] = []
+  let inMultilineComment = false
+  let multilineQuote = ''
 
-  for (const line of lines) {
-    const processedLine = removeCommentsFromLine(line)
-    // 只有当行不是空白时才添加
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i]
+    const trimmed = line.trim()
+
+    // 如果当前在多行注释中
+    if (inMultilineComment) {
+      if (line.includes(multilineQuote)) {
+        inMultilineComment = false
+        multilineQuote = ''
+        continue
+      } else {
+        continue
+      }
+    }
+
+    // 检查是否是多行注释开始
+    if (trimmed.startsWith('"""') || trimmed.startsWith("'''")) {
+      const quote = trimmed.substring(0, 3)
+
+      // 简单判断：如果行只包含引号和文本，很可能是注释
+      const isLikelyComment =
+        /^\s*['"]{3}/.test(line) &&
+        !line.includes('=') &&
+        !line.includes('(') &&
+        !line.includes('[')
+
+      if (isLikelyComment) {
+        // 检查是否在同一行结束
+        const restOfLine = line.substring(line.indexOf(quote) + 3)
+        if (restOfLine.includes(quote)) {
+          // 单行注释块，直接跳过
+          continue
+        } else {
+          // 多行注释块开始
+          inMultilineComment = true
+          multilineQuote = quote
+          continue
+        }
+      }
+    }
+
+    // 处理单行注释
+    const processedLine = removeSingleLineComments(line)
+
+    // 只保留非空行
     if (processedLine.trim()) {
       processedLines.push(processedLine)
     }
@@ -17,79 +64,43 @@ export function removeComments(code: string): string {
   return processedLines.join('\n')
 }
 
-function removeCommentsFromLine(line: string): string {
+/**
+ * 处理单行注释
+ */
+function removeSingleLineComments(line: string): string {
   let result = ''
   let inSingleQuote = false
   let inDoubleQuote = false
-  let inTripleQuote = false
-  let quoteType = ''
-  let i = 0
 
-  while (i < line.length) {
+  for (let i = 0; i < line.length; i++) {
     const char = line[i]
-    const nextChar = line[i + 1]
-    const thirdChar = line[i + 2]
-
-    // 检查三引号
-    if (!inSingleQuote && !inDoubleQuote && !inTripleQuote) {
-      if (
-        (char === '"' && nextChar === '"' && thirdChar === '"') ||
-        (char === "'" && nextChar === "'" && thirdChar === "'")
-      ) {
-        inTripleQuote = true
-        quoteType = char
-        result += char + nextChar + thirdChar
-        i += 3
-        continue
-      }
-    }
-
-    // 检查三引号结束
-    if (inTripleQuote && char === quoteType && nextChar === quoteType && thirdChar === quoteType) {
-      inTripleQuote = false
-      quoteType = ''
-      result += char + nextChar + thirdChar
-      i += 3
-      continue
-    }
-
-    // 如果在三引号内，直接添加字符
-    if (inTripleQuote) {
-      result += char
-      i++
-      continue
-    }
+    const prevChar = i > 0 ? line[i - 1] : ''
 
     // 处理转义字符
-    if (char === '\\' && (inSingleQuote || inDoubleQuote)) {
-      result += char + (nextChar || '')
-      i += 2
+    if (prevChar === '\\') {
+      result += char
       continue
     }
 
-    // 处理单引号
+    // 处理引号
     if (char === "'" && !inDoubleQuote) {
       inSingleQuote = !inSingleQuote
       result += char
-      i++
       continue
     }
 
-    // 处理双引号
     if (char === '"' && !inSingleQuote) {
       inDoubleQuote = !inDoubleQuote
       result += char
-      i++
       continue
     }
 
-    // 如果遇到 # 且不在字符串内，删除后面的所有内容
-    if (char === '#' && !inSingleQuote && !inDoubleQuote && !inTripleQuote) {
+    // 如果遇到 # 且不在字符串内
+    if (char === '#' && !inSingleQuote && !inDoubleQuote) {
       break
     }
 
     result += char
-    i++
   }
 
   return result.trimEnd()

@@ -7,12 +7,21 @@ export class NotebookProcessor {
     options: ProcessOptions,
     originalFileName?: string
   ): ProcessResult {
-    const codeCells = notebook.cells.filter(
-      (cell) => cell.cell_type === 'code' && this.getCellSource(cell).trim()
-    )
+    // 根据选项决定要处理的单元格
+    let cellsToProcess
 
-    if (codeCells.length === 0) {
-      throw new Error('No code cells found in the notebook')
+    if (options.removeMarkdown) {
+      // 只保留代码单元格
+      cellsToProcess = notebook.cells.filter(
+        (cell) => cell.cell_type === 'code' && this.getCellSource(cell).trim()
+      )
+    } else {
+      // 保留所有单元格
+      cellsToProcess = notebook.cells.filter((cell) => this.getCellSource(cell).trim())
+    }
+
+    if (cellsToProcess.length === 0) {
+      throw new Error('No cells with content found in the notebook')
     }
 
     // Generate filename based on original file name
@@ -22,17 +31,17 @@ export class NotebookProcessor {
     let filename: string
 
     if (options.outputFormat === 'python') {
-      content = this.generatePythonFile(codeCells, options)
+      content = this.generatePythonFile(cellsToProcess, options)
       filename = `${baseFileName}_extracted.py`
     } else {
-      content = this.generateMarkdownFile(codeCells, options)
+      content = this.generateMarkdownFile(cellsToProcess, options)
       filename = `${baseFileName}_extracted.md`
     }
 
     return {
       content,
       filename,
-      cellCount: codeCells.length,
+      cellCount: cellsToProcess.filter((cell) => cell.cell_type === 'code').length,
     }
   }
 
@@ -71,14 +80,26 @@ export class NotebookProcessor {
     const codeBlocks: string[] = []
 
     cells.forEach((cell, index) => {
-      let code = this.getCellSource(cell)
+      let cellContent = this.getCellSource(cell)
 
-      if (options.removeComments) {
-        code = removeComments(code)
-      }
+      if (cell.cell_type === 'code') {
+        // 处理代码单元格
+        if (options.removeComments) {
+          cellContent = removeComments(cellContent)
+        }
 
-      if (code.trim()) {
-        codeBlocks.push(`# Cell ${index + 1}\n${code}`)
+        if (cellContent.trim()) {
+          codeBlocks.push(`# Cell ${index + 1} (Code)\n${cellContent}`)
+        }
+      } else if (cell.cell_type === 'markdown') {
+        // 处理Markdown单元格 - 转换为注释
+        if (cellContent.trim()) {
+          const commentedContent = cellContent
+            .split('\n')
+            .map((line) => (line.trim() ? `# ${line}` : '#'))
+            .join('\n')
+          codeBlocks.push(`# Cell ${index + 1} (Markdown)\n${commentedContent}`)
+        }
       }
     })
 
@@ -87,20 +108,30 @@ export class NotebookProcessor {
 
   private static generateMarkdownFile(cells: any[], options: ProcessOptions): string {
     const lines: string[] = []
-    lines.push('# Extracted Code from Jupyter Notebook\n')
+    lines.push('# Extracted Content from Jupyter Notebook\n')
 
     cells.forEach((cell, index) => {
-      let code = this.getCellSource(cell)
+      let cellContent = this.getCellSource(cell)
 
-      if (options.removeComments) {
-        code = removeComments(code)
-      }
+      if (cell.cell_type === 'code') {
+        // 处理代码单元格
+        if (options.removeComments) {
+          cellContent = removeComments(cellContent)
+        }
 
-      if (code.trim()) {
-        lines.push(`## Cell ${index + 1}\n`)
-        lines.push('```python')
-        lines.push(code)
-        lines.push('```\n')
+        if (cellContent.trim()) {
+          lines.push(`## Cell ${index + 1} (Code)\n`)
+          lines.push('```python')
+          lines.push(cellContent)
+          lines.push('```\n')
+        }
+      } else if (cell.cell_type === 'markdown') {
+        // 处理Markdown单元格 - 保留原格式
+        if (cellContent.trim()) {
+          lines.push(`## Cell ${index + 1} (Markdown)\n`)
+          lines.push(cellContent)
+          lines.push('\n')
+        }
       }
     })
 
